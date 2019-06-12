@@ -1,0 +1,21 @@
+---
+- hosts: all
+  name: Disk C cleanup
+  gather_facts: false
+  tasks:
+  - name: Check free disk space
+    win_command:  powershell.exe "Get-WMIObject Win32_LogicalDisk | ForEach-Object {$_.freespace / 1GB} | ConvertTo-Json"
+    register: getpsdrive
+  - name: Run Invoke
+    win_shell: $ScriptFromGitHub = Invoke-WebRequest "https://gist.githubusercontent.com/chaliy/909561/raw/6c4b671104d73b85e79b19f2f656c9a9cac0c147/hello_world.ps1"; Invoke-Expression $($ScriptFromGitHub.Content)
+  - name: Start BleachBit bat file
+    win_command:  powershell.exe C:\temp\BleachBit-Portable\bleachclean_C_Drive.bat
+    register: out
+  - debug: var=out
+  - name: Remove folder BleachBit-Portable from C:\temp
+    win_file:
+      path: C:\temp\BleachBit-Portable
+      state: absent
+  - name: Check free disk space after cleaning
+    win_command:  powershell.exe "Get-WMIObject Win32_LogicalDisk | ForEach-Object {$_.freespace / 1GB} | ConvertTo-Json"
+    register: getpsdrive
