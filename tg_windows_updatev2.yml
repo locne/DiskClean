@@ -1,0 +1,13 @@
+---
+
+- name:  Windows Update
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Running Windows Update
+      win_updates:
+        category_names: ['Application','SecurityUpdates','CriticalUpdates','Updates','Connectors','DefinitionUpdates','DeveloperKits','FeaturePacks','Guidance','ServicePacks','Tools','UpdateRollups']
+      register: result
+    - win_reboot:
+      when: result.reboot_required
+      
